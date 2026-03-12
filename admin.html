@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - Newton Hotel Menu</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+body{font-family:'Poppins',sans-serif;margin:0;padding:20px;background:#f4f4f4;}
+h1{color:#111;text-align:center;}
+form{background:white;padding:15px;border-radius:10px;max-width:400px;margin:20px auto;box-shadow:0 5px 15px rgba(0,0,0,0.1);}
+input,select{width:100%;padding:8px;margin:5px 0;border-radius:5px;border:1px solid #ccc;}
+button{background:#111;color:white;border:none;padding:10px;width:100%;border-radius:5px;margin-top:10px;cursor:pointer;}
+button:hover{background:#333;}
+.item-list{max-width:600px;margin:20px auto;}
+.item-list p{background:white;padding:10px;border-radius:5px;box-shadow:0 3px 10px rgba(0,0,0,0.1);display:flex;justify-content:space-between;align-items:center;margin:5px 0;}
+.item-list button{background:#e67e22;color:white;padding:5px 10px;border-radius:3px;border:none;cursor:pointer;margin-left:5px;}
+.item-list button:hover{background:#c76d17;}
+</style>
+</head>
+<body>
+
+<h1>Admin Panel - Newton Hotel Menu</h1>
+
+<form id="addForm">
+  <input type="text" id="name" placeholder="Food Name" required>
+  <input type="number" id="price" placeholder="Price" required>
+  <input type="text" id="img" placeholder="Image URL" required>
+  <select id="category">
+    <option>Breakfast</option>
+    <option>Lunch</option>
+    <option>Dinner</option>
+    <option>Drinks</option>
+  </select>
+  <button type="submit">Add / Update Item</button>
+</form>
+
+<div class="item-list" id="itemList"></div>
+
+<script>
+let menuItems = JSON.parse(localStorage.getItem('menuItems')) || [];
+
+const addForm = document.getElementById('addForm');
+const itemList = document.getElementById('itemList');
+
+function renderItems(){
+  itemList.innerHTML='';
+  menuItems.forEach((item,index)=>{
+    itemList.innerHTML+=`
+      <p>
+        ${item.name} - Ksh ${item.price} [${item.category}]
+        <span>
+          <button onclick="editItem(${index})">Edit</button>
+          <button onclick="deleteItem(${index})">Delete</button>
+        </span>
+      </p>
+    `;
+  });
+}
+
+addForm.addEventListener('submit',e=>{
+  e.preventDefault();
+  const name=document.getElementById('name').value;
+  const price=Number(document.getElementById('price').value);
+  const img=document.getElementById('img').value;
+  const category=document.getElementById('category').value;
+  const existingIndex = menuItems.findIndex(i=>i.name===name);
+  if(existingIndex>-1){menuItems[existingIndex]={name,price,img,category};}
+  else{menuItems.push({name,price,img,category});}
+  localStorage.setItem('menuItems',JSON.stringify(menuItems));
+  addForm.reset();
+  renderItems();
+  alert('Menu updated! Customer menu will reflect changes.');
+});
+
+function editItem(i){
+  const item = menuItems[i];
+  document.getElementById('name').value=item.name;
+  document.getElementById('price').value=item.price;
+  document.getElementById('img').value=item.img;
+  document.getElementById('category').value=item.category;
+}
+
+function deleteItem(i){
+  if(confirm('Are you sure?')){
+    menuItems.splice(i,1);
+    localStorage.setItem('menuItems',JSON.stringify(menuItems));
+    renderItems();
+  }
+}
+
+renderItems();
+</script>
+
+</body>
+</html>
